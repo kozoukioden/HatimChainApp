@@ -1,6 +1,6 @@
 // Firebase configuration for Hatim Zinciri App
 import { initializeApp } from 'firebase/app';
-import { getFirestore, Firestore } from 'firebase/firestore';
+import { initializeFirestore, Firestore } from 'firebase/firestore';
 
 const firebaseConfig = {
     apiKey: "AIzaSyCOEHFwQE7BHT-G3DuPtLJjsxy04au3YqA",
@@ -12,5 +12,10 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const db: Firestore = getFirestore(app);
+
+// React Native requires long polling - default WebChannel transport doesn't work
+export const db: Firestore = initializeFirestore(app, {
+    experimentalForceLongPolling: true,
+});
+
 export default app;
