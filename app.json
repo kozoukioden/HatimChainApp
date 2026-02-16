@@ -1,0 +1,63 @@
+{
+  "expo": {
+    "name": "Hatim Zinciri",
+    "slug": "HatimZinciri",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "scheme": "hatimzinciri",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#01241e"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.hatimzinciri.app",
+      "buildNumber": "1.0.0"
+    },
+    "android": {
+      "package": "com.hatimzinciri.app",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#01241e"
+      },
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "VIBRATE",
+        "RECEIVE_BOOT_COMPLETED"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Namaz vakitlerini konumunuza göre göstermek için konum izni gereklidir."
+        }
+      ],
+      "expo-router",
+      [
+        "expo-notifications",
+        {
+          "sounds": []
+        }
+      ],
+      "expo-sensors",
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-3940256099942544~3347511713",
+          "iosAppId": "ca-app-pub-3940256099942544~1458002511"
+        }
+      ]
+    ]
+  }
+}

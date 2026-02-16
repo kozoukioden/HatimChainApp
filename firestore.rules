@@ -1,0 +1,19 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /chains/{chainId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null;
+    }
+    match /users/{userId} {
+      allow read: if true;
+      allow create: if true;
+      allow update, delete: if request.auth != null && request.auth.uid == userId;
+    }
+    match /follows/{followId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+  }
+}

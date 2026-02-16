@@ -1,0 +1,29 @@
+{
+    "project_info": {
+        "project_number": "411049527311",
+        "project_id": "hatim-zinciri-app",
+        "storage_bucket": "hatim-zinciri-app.firebasestorage.app"
+    },
+    "client": [
+        {
+            "client_info": {
+                "mobilesdk_app_id": "1:411049527311:android:b28edfd91a62ac8dbbfb7a",
+                "android_client_info": {
+                    "package_name": "com.kozoukioden.hatimzinciri"
+                }
+            },
+            "oauth_client": [],
+            "api_key": [
+                {
+                    "current_key": "AIzaSyCOEHFwQE7BHT-G3DuPtLJjsxy04au3YqA"
+                }
+            ],
+            "services": {
+                "appinvite_service": {
+                    "other_platform_oauth_client": []
+                }
+            }
+        }
+    ],
+    "configuration_version": "1"
+}
