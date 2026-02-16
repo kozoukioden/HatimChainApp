@@ -1,7 +1,7 @@
 // Firebase configuration for Hatim Zinciri App
 import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import { getFirestore, Firestore } from 'firebase/firestore';
+import { getAuth, signInAnonymously } from 'firebase/auth';
 
 const firebaseConfig = {
     apiKey: "AIzaSyCOEHFwQE7BHT-G3DuPtLJjsxy04au3YqA",
@@ -13,6 +13,12 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+export const db: Firestore = getFirestore(app);
 export const auth = getAuth(app);
+
+// Auto sign-in anonymously so Firestore rules work
+signInAnonymously(auth).catch((error) => {
+    console.log('Anonymous auth error (non-critical):', error.message);
+});
+
 export default app;

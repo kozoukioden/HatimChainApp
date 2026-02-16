@@ -86,19 +86,24 @@ export const ChainService = {
         niyetDescription?: string;
         hiddenParticipants?: boolean;
     }): Promise<Chain> {
-        const chain: Omit<Chain, 'id'> = {
-            ...data,
-            parts: Array.from({ length: data.totalParts }, (_, i) => ({
-                number: i + 1,
-                status: 'available' as const,
-            })),
-            participants: [data.createdBy],
-            createdAt: new Date().toISOString(),
-            isCompleted: false,
-        };
+        try {
+            const chain: Omit<Chain, 'id'> = {
+                ...data,
+                parts: Array.from({ length: data.totalParts }, (_, i) => ({
+                    number: i + 1,
+                    status: 'available' as const,
+                })),
+                participants: [data.createdBy],
+                createdAt: new Date().toISOString(),
+                isCompleted: false,
+            };
 
-        const docRef = await addDoc(collection(db, CHAINS_COLLECTION), chain);
-        return { id: docRef.id, ...chain };
+            const docRef = await addDoc(collection(db, CHAINS_COLLECTION), chain);
+            return { id: docRef.id, ...chain };
+        } catch (e) {
+            console.error('createChain error:', e);
+            throw e;
+        }
     },
 
     async claimPart(chainId: string, partNumber: number, userId: string, userName: string): Promise<boolean> {
