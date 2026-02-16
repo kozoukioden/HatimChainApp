@@ -130,10 +130,11 @@ export default function CreateChainScreen() {
                     },
                 },
             ]);
-        } catch (e) {
+        } catch (e: any) {
             setLoading(false);
-            console.error(e);
-            Alert.alert('Hata', 'Zincir oluşturulurken bir hata oluştu.');
+            console.error('Chain create error:', e);
+            const errorMsg = e?.message || e?.code || JSON.stringify(e) || 'Bilinmeyen hata';
+            Alert.alert('Hata', `Zincir oluşturulurken bir hata oluştu:\n\n${errorMsg}`);
         }
     };
 
