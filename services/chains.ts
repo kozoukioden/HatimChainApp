@@ -98,7 +98,10 @@ export const ChainService = {
                 isCompleted: false,
             };
 
-            const docRef = await addDoc(collection(db, CHAINS_COLLECTION), chain);
+            // Firestore does not accept undefined values, strip them
+            const cleanChain = JSON.parse(JSON.stringify(chain));
+
+            const docRef = await addDoc(collection(db, CHAINS_COLLECTION), cleanChain);
             return { id: docRef.id, ...chain };
         } catch (e) {
             console.error('createChain error:', e);
