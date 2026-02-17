@@ -1,7 +1,4 @@
-import { db } from './firebase';
-import {
-    collection, doc, getDoc, setDoc, updateDoc
-} from 'firebase/firestore';
+import { FirestoreREST } from './firestore-rest';
 
 const FOLLOWS_COLLECTION = 'follows';
 
@@ -12,10 +9,9 @@ interface FollowEntry {
 
 async function getUserFollowData(userId: string): Promise<FollowEntry> {
     try {
-        const docRef = doc(db, FOLLOWS_COLLECTION, userId);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-            return docSnap.data() as FollowEntry;
+        const doc = await FirestoreREST.getDoc(`${FOLLOWS_COLLECTION}/${userId}`);
+        if (doc) {
+            return doc.data as FollowEntry;
         }
         return { followers: [], following: [] };
     } catch {
@@ -24,8 +20,23 @@ async function getUserFollowData(userId: string): Promise<FollowEntry> {
 }
 
 async function saveUserFollowData(userId: string, data: FollowEntry): Promise<void> {
-    const docRef = doc(db, FOLLOWS_COLLECTION, userId);
-    await setDoc(docRef, data);
+    try {
+        // Try to update first
+        await FirestoreREST.updateDoc(`${FOLLOWS_COLLECTION}/${userId}`, data);
+    } catch {
+        // If document doesn't exist, create it — use a workaround with PATCH and full fields
+        const url = `https://firestore.googleapis.com/v1/projects/hatim-zinciri-app/databases/(default)/documents/${FOLLOWS_COLLECTION}/${userId}?key=AIzaSyCOEHFwQE7BHT-G3DuPtLJjsxy04au3YqA`;
+        await fetch(url, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                fields: {
+                    followers: { arrayValue: { values: data.followers.map(f => ({ stringValue: f })) } },
+                    following: { arrayValue: { values: data.following.map(f => ({ stringValue: f })) } },
+                }
+            }),
+        });
+    }
 }
 
 export const SocialService = {

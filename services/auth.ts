@@ -1,8 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { db } from './firebase';
-import {
-    collection, doc, getDocs, getDoc, setDoc, query, where, addDoc
-} from 'firebase/firestore';
+import { FirestoreREST } from './firestore-rest';
 import * as Crypto from 'expo-crypto';
 import { validateEmail, sanitizeInput } from './utils';
 
@@ -52,30 +49,27 @@ export const AuthService = {
             }
 
             // Check if user exists in Firestore
-            const usersRef = collection(db, USERS_COLLECTION);
-            const snapshot = await getDocs(usersRef);
-            const existingUsers = snapshot.docs.map(d => d.data() as User);
-
-            if (existingUsers.find(u => u.email === email)) {
+            const existingUsers = await FirestoreREST.listDocs(USERS_COLLECTION);
+            if (existingUsers.find(u => u.data.email === email)) {
                 return { success: false, error: 'Bu e-posta adresi zaten kayıtlı.' };
             }
 
             const hashedPassword = await hashPassword(password);
 
-            const user: User = {
-                id: '',
+            const userData = {
                 email,
                 password: hashedPassword,
                 fullName,
                 createdAt: new Date().toISOString(),
             };
 
-            // Add to Firestore and get auto-generated ID
-            const docRef = await addDoc(collection(db, USERS_COLLECTION), user);
-            user.id = docRef.id;
+            // Create user in Firestore
+            const result = await FirestoreREST.createDoc(USERS_COLLECTION, userData);
 
-            // Update the document with its own ID
-            await setDoc(docRef, user);
+            // Update with its own ID
+            await FirestoreREST.updateDoc(`${USERS_COLLECTION}/${result.id}`, { id: result.id });
+
+            const user: User = { id: result.id, ...userData };
 
             // Store locally for session
             await AsyncStorage.setItem(USER_KEY, JSON.stringify(user));
@@ -98,9 +92,8 @@ export const AuthService = {
             const hashedPassword = await hashPassword(password);
 
             // Check Firestore
-            const usersRef = collection(db, USERS_COLLECTION);
-            const snapshot = await getDocs(usersRef);
-            const users = snapshot.docs.map(d => ({ id: d.id, ...d.data() })) as User[];
+            const docs = await FirestoreREST.listDocs(USERS_COLLECTION);
+            const users = docs.map(d => ({ id: d.id, ...d.data })) as User[];
 
             let user = users.find(u => u.email === email && u.password === hashedPassword);
             if (!user) {
@@ -125,9 +118,8 @@ export const AuthService = {
 
     async getAllUsers(): Promise<User[]> {
         try {
-            const usersRef = collection(db, USERS_COLLECTION);
-            const snapshot = await getDocs(usersRef);
-            return snapshot.docs.map(d => ({ id: d.id, ...d.data() })) as User[];
+            const docs = await FirestoreREST.listDocs(USERS_COLLECTION);
+            return docs.map(d => ({ id: d.id, ...d.data })) as User[];
         } catch (e) {
             return [];
         }
