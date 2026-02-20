@@ -231,10 +231,10 @@ export default function HomeScreen() {
 
         // Chains
         if (currentUser) {
-            const mine = await ChainService.getMyChains(currentUser.id);
+            const mine = await ChainService.getChainsByUser(currentUser.id);
             setMyChains(mine.slice(0, 10));
         }
-        const allChains = await ChainService.getChains();
+        const allChains = await ChainService.getAllChains();
         setRecentChains(allChains.slice(0, 5));
     }, [fetchPrayerTimes]);
 

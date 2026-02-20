@@ -200,4 +200,16 @@ export const ChainService = {
             return [];
         }
     },
+
+    getProgress(chain: Chain): { percent: number; completed: number; taken: number; available: number } {
+        if (!chain || !chain.parts || chain.parts.length === 0) {
+            return { percent: 0, completed: 0, taken: 0, available: 0 };
+        }
+        const total = chain.parts.length;
+        const completed = chain.parts.filter(p => p.status === 'completed').length;
+        const taken = chain.parts.filter(p => p.status === 'taken').length;
+        const available = chain.parts.filter(p => p.status === 'available').length;
+        const percent = Math.round((completed / total) * 100);
+        return { percent, completed, taken, available };
+    },
 };

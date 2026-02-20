@@ -29,7 +29,7 @@ export default function UserProfileScreen() {
             AuthService.getCurrentUser(),
             LeaderboardService.getUserStats(id),
             SocialService.getFollowCounts(id),
-            ChainService.getChains(),
+            ChainService.getAllChains(),
         ]);
 
         const foundUser = allUsers.find(u => u.id === id);

@@ -26,7 +26,7 @@ export default function ProfileScreen() {
             const [s, fc, allChains] = await Promise.all([
                 LeaderboardService.getUserStats(u.id),
                 SocialService.getFollowCounts(u.id),
-                ChainService.getChains(),
+                ChainService.getAllChains(),
             ]);
             setStats(s);
             setFollowCounts(fc);

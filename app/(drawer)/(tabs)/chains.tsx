@@ -127,7 +127,7 @@ export default function ChainsScreen() {
     // --- Load data ---
     const loadChains = useCallback(async () => {
         try {
-            const allChains = await ChainService.getChains();
+            const allChains = await ChainService.getAllChains();
             setChains(allChains);
         } catch (e) {
             console.error('Failed to load chains:', e);

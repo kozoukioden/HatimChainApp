@@ -120,13 +120,15 @@ export default function CreateChainScreen() {
                 {
                     text: 'Tamam',
                     onPress: () => {
-                        // Use replace to prevent going back to create screen and ensure fresh navigation
-                        if (chain && chain.id) {
-                            router.replace(`/chain/${chain.id}`);
-                        } else {
-                            // Fallback if ID is missing (should not happen)
-                            router.back();
-                        }
+                        // Android/iOS: Modal dismiss and navigation at exactly the same time can cause a crash
+                        setTimeout(() => {
+                            if (chain && chain.id) {
+                                router.replace(`/chain/${chain.id}`);
+                            } else {
+                                // Fallback if ID is missing (should not happen)
+                                router.back();
+                            }
+                        }, 100);
                     },
                 },
             ]);
