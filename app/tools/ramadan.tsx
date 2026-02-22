@@ -31,6 +31,15 @@ interface PrayerTimes {
 
 const STORAGE_KEY_FASTING = 'HATIM_RAMADAN_FASTING';
 
+const IFTAR_MENUS = [
+    ['Mercimek Çorbası', 'İslim Kebabı', 'Pirinç Pilavı', 'Mevsim Salatası', 'Güllaç'],
+    ['Ezogelin Çorbası', 'Fırın Tavuk', 'Bulgur Pilavı', 'Cacık', 'Sütlaç'],
+    ['Tarhana Çorbası', 'Karnıyarık', 'Pirinç Pilavı', 'Yoğurt', 'Şekerpare'],
+    ['Domates Çorbası', 'Etli Orman Kebabı', 'Arpa Şehriye Pilavı', 'Çoban Salata', 'Revani'],
+    ['Yayla Çorbası', 'Kıymalı Pide', 'Ayran', 'Çoban Salata', 'Kemalpaşa Tatlısı'],
+    ['Sebze Çorbası', 'Mantar Sote', 'Makarna', 'Mevsim Salatası', 'Künefe'],
+    ['Tavuk Suyu Çorbası', 'Köfte Patates', 'Pirinç Pilavı', 'Ayran', 'Meyve Tabağı']
+];
 export default function RamadanScreen() {
     const [loading, setLoading] = useState(true);
     const [prayerTimes, setPrayerTimes] = useState<PrayerTimes | null>(null);
@@ -39,6 +48,9 @@ export default function RamadanScreen() {
     const [fastingDays, setFastingDays] = useState<string[]>([]); // 'YYYY-MM-DD'
     const [activeTab, setActiveTab] = useState<'imsakiye' | 'menuler' | 'takip'>('imsakiye');
     const [waterReminder, setWaterReminder] = useState(false);
+
+    const todayMenuIndex = new Date().getDate() % IFTAR_MENUS.length;
+    const todayMenu = IFTAR_MENUS[todayMenuIndex];
 
     useEffect(() => {
         loadData();
@@ -258,11 +270,11 @@ export default function RamadanScreen() {
                     <View>
                         <View style={{ backgroundColor: '#032b23', borderRadius: 16, padding: 16, marginBottom: 16 }}>
                             <Text style={{ color: '#D4AF37', fontSize: 18, fontWeight: '700', marginBottom: 12 }}>Günün İftar Menüsü</Text>
-                            <Text style={{ color: '#fff', fontSize: 15, marginBottom: 6 }}>• Mercimek Çorbası</Text>
-                            <Text style={{ color: '#fff', fontSize: 15, marginBottom: 6 }}>• İslim Kebabı</Text>
-                            <Text style={{ color: '#fff', fontSize: 15, marginBottom: 6 }}>• Pirinç Pilavı</Text>
-                            <Text style={{ color: '#fff', fontSize: 15, marginBottom: 6 }}>• Mevsim Salatası</Text>
-                            <Text style={{ color: '#fff', fontSize: 15 }}>• Güllaç</Text>
+                            {todayMenu.map((item, idx) => (
+                                <Text key={idx} style={{ color: '#fff', fontSize: 15, marginBottom: idx === todayMenu.length - 1 ? 0 : 6 }}>
+                                    • {item}
+                                </Text>
+                            ))}
                         </View>
 
                         <View style={{ backgroundColor: '#032b23', borderRadius: 16, padding: 16, marginBottom: 16 }}>

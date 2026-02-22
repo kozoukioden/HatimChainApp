@@ -40,8 +40,9 @@ export default function ProfileScreen() {
         if (!user) return;
         const code = SocialService.generateProfileCode(user.id);
         try {
+            const appLink = `https://hatimchain.com/profile/${code}`;
             await Share.share({
-                message: `Hatim Zinciri'nde beni takip edin!\nProfil Kodum: ${code}\nAd: ${user.fullName}`,
+                message: `Hatim Zinciri'nde beni takip edin!\nProfil Kodum: ${code}\nAd: ${user.fullName}\n\nProfilimi Gör: ${appLink}`,
             });
         } catch { }
     };
@@ -77,10 +78,17 @@ export default function ProfileScreen() {
                     </View>
                     <Text style={{ color: '#fff', fontSize: 22, fontWeight: '800' }}>{user.fullName}</Text>
                     <Text style={{ color: '#4a7a72', fontSize: 13, marginTop: 4 }}>{user.email}</Text>
-                    <TouchableOpacity onPress={handleShare} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 12, backgroundColor: 'rgba(112,197,187,0.1)', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20 }}>
-                        <Ionicons name="share-social-outline" size={16} color="#70c5bb" />
-                        <Text style={{ color: '#70c5bb', fontSize: 13, fontWeight: '600', marginLeft: 6 }}>Profili Paylaş</Text>
-                    </TouchableOpacity>
+                    <View style={{ flexDirection: 'row', gap: 10, marginTop: 12 }}>
+                        <TouchableOpacity onPress={handleShare} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(112,197,187,0.1)', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20 }}>
+                            <Ionicons name="share-social-outline" size={16} color="#70c5bb" />
+                            <Text style={{ color: '#70c5bb', fontSize: 13, fontWeight: '600', marginLeft: 6 }}>Profili Paylaş</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={() => router.push('/tools/user-search')} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#70c5bb', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20 }}>
+                            <Ionicons name="search" size={16} color="#01241e" />
+                            <Text style={{ color: '#01241e', fontSize: 13, fontWeight: '600', marginLeft: 6 }}>Kullanıcı Ara</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
 
                 {/* Follow Counts */}

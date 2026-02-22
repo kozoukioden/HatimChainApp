@@ -17,7 +17,7 @@ export const LeaderboardService = {
     async getTopUsers(): Promise<UserStats[]> {
         try {
             const users = await AuthService.getAllUsers();
-            const chains = await ChainService.getChains();
+            const chains = await ChainService.getAllChains();
 
             const statsMap: Record<string, UserStats> = {};
 

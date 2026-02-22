@@ -164,7 +164,7 @@ export default function QuranToolScreen() {
             <View style={{ flex: 1, backgroundColor: '#01241e', justifyContent: 'center', alignItems: 'center' }}>
                 <Stack.Screen options={{ title: "Kur'an-\u0131 Kerim", headerStyle: { backgroundColor: '#01241e' }, headerTintColor: '#70c5bb', headerTitleStyle: { color: '#fff' } }} />
                 <ActivityIndicator size="large" color="#70c5bb" />
-                <Text style={{ color: '#a8c5bf', marginTop: 12, fontSize: 14 }}>Sureler y\u00fckleniyor...</Text>
+                <Text style={{ color: '#a8c5bf', marginTop: 12, fontSize: 14 }}>Sureler yükleniyor...</Text>
             </View>
         );
     }
@@ -220,7 +220,7 @@ export default function QuranToolScreen() {
                         <View style={{ flex: 1 }}>
                             <Text style={{ color: '#fff', fontSize: 15, fontWeight: '600' }}>{item.englishName}</Text>
                             <Text style={{ color: '#4a7a72', fontSize: 12, marginTop: 2 }}>
-                                {item.numberOfAyahs} ayet \u00b7 {item.revelationType === 'Meccan' ? 'Mekki' : 'Medeni'}
+                                {item.numberOfAyahs} ayet · {item.revelationType === 'Meccan' ? 'Mekki' : 'Medeni'}
                             </Text>
                         </View>
                         <Text style={{ color: '#D4AF37', fontSize: 18, fontWeight: '500' }}>{item.name}</Text>
@@ -229,7 +229,7 @@ export default function QuranToolScreen() {
                 ListEmptyComponent={
                     <View style={{ alignItems: 'center', paddingVertical: 60 }}>
                         <Ionicons name="book-outline" size={48} color="#4a7a72" />
-                        <Text style={{ color: '#a8c5bf', fontSize: 16, marginTop: 16 }}>Sure bulunamad\u0131.</Text>
+                        <Text style={{ color: '#a8c5bf', fontSize: 16, marginTop: 16 }}>Sure bulunamadı.</Text>
                     </View>
                 }
             />

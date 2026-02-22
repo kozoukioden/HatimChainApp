@@ -1,7 +1,7 @@
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Drawer } from 'expo-router/drawer';
 import { Ionicons } from '@expo/vector-icons';
-import { View, Image, Text } from 'react-native';
+import { View, Image, Text, Linking } from 'react-native';
 import { DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import { router } from 'expo-router';
 
@@ -60,6 +60,22 @@ function CustomDrawerContent(props: any) {
                     label="Ayarlar"
                     icon={({ color, size }) => <Ionicons name="settings-outline" size={size} color={color} />}
                     onPress={() => router.push('/tools/settings')}
+                    labelStyle={{ color: '#a8c5bf' }}
+                    inactiveTintColor="#a8c5bf"
+                />
+
+                <DrawerItem
+                    label="Rehber ve SSS"
+                    icon={({ color, size }) => <Ionicons name="information-circle-outline" size={size} color={color} />}
+                    onPress={() => router.push('/tools/faq')}
+                    labelStyle={{ color: '#a8c5bf' }}
+                    inactiveTintColor="#a8c5bf"
+                />
+
+                <DrawerItem
+                    label="Bize Ulaşın"
+                    icon={({ color, size }) => <Ionicons name="mail-outline" size={size} color={color} />}
+                    onPress={() => Linking.openURL('mailto:destek@hatimchain.com?subject=Destek/Öneri')}
                     labelStyle={{ color: '#a8c5bf' }}
                     inactiveTintColor="#a8c5bf"
                 />

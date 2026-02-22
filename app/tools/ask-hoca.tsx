@@ -75,7 +75,11 @@ export default function AskHocaScreen() {
     };
 
     return (
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1, backgroundColor: '#01241e' }}>
+        <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+            style={{ flex: 1, backgroundColor: '#01241e' }}
+        >
             <StatusBar style="light" />
             <Stack.Screen options={{ title: 'Dini Sohbet', headerStyle: { backgroundColor: '#01241e' }, headerTintColor: '#70c5bb' }} />
 

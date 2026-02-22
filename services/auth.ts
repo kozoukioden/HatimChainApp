@@ -116,6 +116,13 @@ export const AuthService = {
         await AsyncStorage.removeItem(USER_KEY);
     },
 
+    async getUserData(userId: string): Promise<User | null> {
+        try {
+            const doc = await FirestoreREST.getDoc(`${USERS_COLLECTION}/${userId}`);
+            return doc ? { id: doc.id, ...doc.data } as User : null;
+        } catch { return null; }
+    },
+
     async getAllUsers(): Promise<User[]> {
         try {
             const docs = await FirestoreREST.listDocs(USERS_COLLECTION);

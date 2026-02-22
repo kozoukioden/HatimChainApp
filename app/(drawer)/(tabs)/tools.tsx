@@ -23,10 +23,10 @@ export default function ToolsScreen() {
             contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 20, paddingBottom: 40 }}
         >
             <Text style={{ color: '#fff', fontSize: 22, fontWeight: '800', marginBottom: 6 }}>
-                Ara\u00e7lar
+                Araçlar
             </Text>
             <Text style={{ color: '#4a7a72', fontSize: 14, marginBottom: 24 }}>
-                T\u00fcm ara\u00e7lara buradan ula\u015fabilirsiniz
+                Tüm araçlara buradan ulaşabilirsiniz
             </Text>
 
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
