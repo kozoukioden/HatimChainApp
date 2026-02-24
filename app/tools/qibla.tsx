@@ -155,10 +155,10 @@ export default function QiblaScreen() {
                     justifyContent: 'flex-start',
                     transform: [{ rotate: `${qiblaAngle}deg` }]
                 }}>
-                    <View style={{ paddingTop: 10, alignItems: 'center' }}>
+                    <View style={{ paddingTop: 35, alignItems: 'center' }}>
                         <Ionicons
-                            name="navigate"
-                            size={48}
+                            name="arrow-up"
+                            size={44}
                             color={isAligned ? '#D4AF37' : '#70c5bb'}
                         />
                     </View>

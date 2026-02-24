@@ -8,6 +8,7 @@ export default function SettingsScreen() {
         prayerNotifications: false,
         chainNotifications: false,
         prayerMinutesBefore: 10,
+        dailyPrayerSummary: false,
     });
 
     useEffect(() => {
@@ -38,6 +39,14 @@ export default function SettingsScreen() {
                 Alert.alert('İzin Gerekli', 'Bildirimler için izin vermeniz gerekiyor.');
                 setSettings(prev => ({ ...prev, chainNotifications: false }));
                 await NotificationService.saveSettings({ ...newSettings, chainNotifications: false });
+            }
+        }
+        if (key === 'dailyPrayerSummary' && value) {
+            const granted = await NotificationService.registerForPushNotifications();
+            if (!granted) {
+                Alert.alert('İzin Gerekli', 'Bildirimler için izin vermeniz gerekiyor.');
+                setSettings(prev => ({ ...prev, dailyPrayerSummary: false }));
+                await NotificationService.saveSettings({ ...newSettings, dailyPrayerSummary: false });
             }
         }
     };
@@ -87,6 +96,22 @@ export default function SettingsScreen() {
                             </View>
                         </View>
                     )}
+
+                    <View style={{ height: 1, backgroundColor: 'rgba(112,197,187,0.06)', marginHorizontal: 16 }} />
+
+                    <View style={{ flexDirection: 'row', alignItems: 'center', padding: 16 }}>
+                        <Ionicons name="notifications-outline" size={22} color="#70c5bb" />
+                        <View style={{ flex: 1, marginLeft: 14 }}>
+                            <Text style={{ color: '#fff', fontSize: 15, fontWeight: '600' }}>Sabit Bildirim (Günlük Özet)</Text>
+                            <Text style={{ color: '#4a7a72', fontSize: 12, marginTop: 2 }}>Bildirim panelinde günlük namaz vakitleri</Text>
+                        </View>
+                        <Switch
+                            value={settings.dailyPrayerSummary}
+                            onValueChange={v => updateSetting('dailyPrayerSummary', v)}
+                            trackColor={{ false: '#4a7a72', true: 'rgba(112,197,187,0.4)' }}
+                            thumbColor={settings.dailyPrayerSummary ? '#70c5bb' : '#a8c5bf'}
+                        />
+                    </View>
 
                     <View style={{ height: 1, backgroundColor: 'rgba(112,197,187,0.06)', marginHorizontal: 16 }} />
 

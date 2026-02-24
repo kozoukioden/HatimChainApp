@@ -55,7 +55,7 @@ export default function FAQScreen() {
 
                     <TouchableOpacity
                         style={{ backgroundColor: '#e74c3c', padding: 15, paddingHorizontal: 30, borderRadius: 12, alignItems: 'center', flexDirection: 'row' }}
-                        onPress={() => Linking.openURL('mailto:destek@hatimchain.com?subject=Bug Bildirimi')}
+                        onPress={() => Linking.openURL('mailto:hmsoftwarestudio@gmail.com?subject=Bug Bildirimi')}
                         activeOpacity={0.8}
                     >
                         <Ionicons name="flag" size={18} color="white" style={{ marginRight: 8 }} />

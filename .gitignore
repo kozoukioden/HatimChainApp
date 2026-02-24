@@ -43,3 +43,10 @@ yarn-error.log*
 
 # API keys config
 services/config.ts
+google-services.json
+
+# Local test and data files (do not upload to repo)
+test*.js
+fix_utf8.js
+*.txt
+chains*.json

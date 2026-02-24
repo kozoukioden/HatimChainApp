@@ -12,11 +12,13 @@ import {
 } from 'react-native';
 import { useState, useCallback, useEffect } from 'react';
 import { useFocusEffect, router } from 'expo-router';
+import * as Notifications from 'expo-notifications';
 import { Ionicons } from '@expo/vector-icons';
 import { PrayerService, PrayerTimes } from '../../../services/api';
 import { AuthService, User } from '../../../services/auth';
 import { ChainService, Chain } from '../../../services/chains';
 import { KandilService, KandilDate } from '../../../services/kandil';
+import { NotificationService } from '../../../services/notifications';
 import * as Location from 'expo-location';
 import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 
@@ -104,9 +106,31 @@ export default function HomeScreen() {
     const [recentChains, setRecentChains] = useState<Chain[]>([]);
     const [kandils, setKandils] = useState<KandilDate[]>([]);
     const [refreshing, setRefreshing] = useState(false);
-    const [ramadanCountdown, setRamadanCountdown] = useState<{ target: string; time: string; hours: number; minutes: number; remainingDays: number } | null>(null);
+    const [ramadanCountdown, setRamadanCountdown] = useState<{ target: string; time: string; hours: number; minutes: number; remainingDays: number; currentDay?: number } | null>(null);
+
+    const IFTAR_MENUS = [
+        ['Mercimek Çorbası', 'İslim Kebabı', 'Pirinç Pilavı', 'Mevsim Salatası', 'Güllaç'],
+        ['Ezogelin Çorbası', 'Fırın Tavuk', 'Bulgur Pilavı', 'Cacık', 'Sütlaç'],
+        ['Tarhana Çorbası', 'Karnıyarık', 'Pirinç Pilavı', 'Yoğurt', 'Şekerpare'],
+        ['Domates Çorbası', 'Etli Orman Kebabı', 'Arpa Şehriye Pilavı', 'Çoban Salata', 'Revani'],
+        ['Yayla Çorbası', 'Kıymalı Pide', 'Ayran', 'Çoban Salata', 'Kemalpaşa Tatlısı'],
+        ['Sebze Çorbası', 'Mantar Sote', 'Makarna', 'Mevsim Salatası', 'Künefe'],
+        ['Tavuk Suyu Çorbası', 'Köfte Patates', 'Pirinç Pilavı', 'Ayran', 'Meyve Tabağı']
+    ];
+    const todayMenuIndex = new Date().getDate() % IFTAR_MENUS.length;
+    const todayMenu = IFTAR_MENUS[todayMenuIndex];
 
     const dailyVerse = getDailyVerse();
+
+    // Request base permissions on load if not asked
+    useEffect(() => {
+        (async () => {
+            const { status } = await Notifications.getPermissionsAsync();
+            if (status !== 'granted') {
+                await Notifications.requestPermissionsAsync();
+            }
+        })();
+    }, []);
 
     // Ramazan countdown timer
     useEffect(() => {
@@ -146,8 +170,13 @@ export default function HomeScreen() {
             const m = diffMinutes % 60;
 
             // Ramazan 2026: ~Feb 18 - Mar 19 (approx)
+            const ramadanStart = new Date(2026, 1, 18); // Feb 18
             const ramadanEnd = new Date(2026, 2, 19); // March 19, 2026
             const daysLeft = Math.max(0, Math.ceil((ramadanEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+            let currentDay = 0;
+            if (now >= ramadanStart && now <= ramadanEnd) {
+                currentDay = Math.floor((now.getTime() - ramadanStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+            }
 
             setRamadanCountdown({
                 target: targetName,
@@ -155,6 +184,7 @@ export default function HomeScreen() {
                 hours: h,
                 minutes: m,
                 remainingDays: Math.min(daysLeft, 30),
+                currentDay: currentDay
             });
         };
 
@@ -211,9 +241,15 @@ export default function HomeScreen() {
                 times = await PrayerService.getPrayerTimes('Istanbul', 'Turkey');
             }
             setPrayerTimes(times);
+            if (times) {
+                NotificationService.scheduleAllPrayers(times);
+            }
         } catch {
             const times = await PrayerService.getPrayerTimes('Istanbul', 'Turkey');
             setPrayerTimes(times);
+            if (times) {
+                NotificationService.scheduleAllPrayers(times);
+            }
             setLocationText('İstanbul, Türkiye');
         } finally {
             setLoadingPrayer(false);
@@ -233,6 +269,7 @@ export default function HomeScreen() {
         if (currentUser) {
             const mine = await ChainService.getChainsByUser(currentUser.id);
             setMyChains(mine.slice(0, 10));
+            NotificationService.scheduleChainNotifications(mine);
         }
         const allChains = await ChainService.getAllChains();
         setRecentChains(allChains.slice(0, 5));
@@ -362,7 +399,11 @@ export default function HomeScreen() {
                             <Ionicons name="moon" size={20} color={COLORS.gold} />
                             <Text style={{ fontSize: 16, fontWeight: '700', color: '#fff', flex: 1 }}>Ramazan</Text>
                             <View style={{ backgroundColor: 'rgba(212,175,55,0.15)', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 }}>
-                                <Text style={{ color: COLORS.gold, fontSize: 11, fontWeight: '700' }}>{ramadanCountdown.remainingDays} gün kaldı</Text>
+                                <Text style={{ color: COLORS.gold, fontSize: 11, fontWeight: '700' }}>
+                                    {ramadanCountdown.currentDay && ramadanCountdown.currentDay > 0
+                                        ? `Ramazan'ın ${ramadanCountdown.currentDay}. Günü`
+                                        : `${ramadanCountdown.remainingDays} gün kaldı`}
+                                </Text>
                             </View>
                         </View>
                         <View style={{ alignItems: 'center', paddingVertical: 8 }}>
@@ -376,8 +417,14 @@ export default function HomeScreen() {
                                 {ramadanCountdown.target === 'İFTAR' ? 'Akşam' : 'İmsak'}: {ramadanCountdown.time}
                             </Text>
                         </View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 8, gap: 4 }}>
-                            <Text style={{ color: COLORS.accent, fontSize: 12, fontWeight: '600' }}>İmsakiye & Ramazan Takvimi</Text>
+                        <View style={{ marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.05)' }}>
+                            <Text style={{ color: '#a8c5bf', fontSize: 12, marginBottom: 6, fontWeight: '600' }}>Günün İftar Menüsü</Text>
+                            <Text style={{ color: '#fff', fontSize: 13, lineHeight: 20 }}>
+                                {todayMenu.join(' • ')}
+                            </Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 16, gap: 4 }}>
+                            <Text style={{ color: COLORS.accent, fontSize: 12, fontWeight: '600' }}>İmsakiye & Oruç Takibi</Text>
                             <Ionicons name="chevron-forward" size={14} color={COLORS.accent} />
                         </View>
                     </TouchableOpacity>
@@ -402,15 +449,18 @@ export default function HomeScreen() {
 
                     {/* Next prayer highlight */}
                     {nextPrayer && prayerTimes && !loadingPrayer && (
-                        <View style={styles.nextPrayerBanner}>
-                            <Ionicons name="time-outline" size={18} color={COLORS.gold} />
-                            <Text style={styles.nextPrayerText}>
-                                Sıradaki: <Text style={styles.nextPrayerName}>{PRAYER_NAMES[nextPrayer.name]}</Text>
-                                {'  '}
-                                <Text style={styles.nextPrayerTime}>{nextPrayer.time}</Text>
-                                {'  '}
-                                <Text style={styles.nextPrayerRemaining}>({formatTimeRemaining(nextPrayer.time)})</Text>
-                            </Text>
+                        <View style={[styles.nextPrayerBanner, { flexDirection: 'column', alignItems: 'center', gap: 6 }]}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                                <Ionicons name="time-outline" size={18} color={COLORS.gold} />
+                                <Text style={styles.nextPrayerText}>
+                                    Sıradaki: <Text style={styles.nextPrayerName}>{PRAYER_NAMES[nextPrayer.name]}</Text>
+                                    {'  '}
+                                    <Text style={styles.nextPrayerTime}>{nextPrayer.time}</Text>
+                                </Text>
+                            </View>
+                            <View style={{ backgroundColor: 'rgba(212,175,55,0.1)', paddingHorizontal: 16, paddingVertical: 4, borderRadius: 12 }}>
+                                <Text style={{ color: COLORS.gold, fontSize: 14, fontWeight: '700' }}>Ezana {formatTimeRemaining(nextPrayer.time)} kaldı</Text>
+                            </View>
                         </View>
                     )}
 

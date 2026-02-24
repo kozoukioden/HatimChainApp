@@ -43,6 +43,7 @@ const IFTAR_MENUS = [
 export default function RamadanScreen() {
     const [loading, setLoading] = useState(true);
     const [prayerTimes, setPrayerTimes] = useState<PrayerTimes | null>(null);
+    const [monthlyPrayerTimes, setMonthlyPrayerTimes] = useState<any[]>([]);
     const [nextPrayer, setNextPrayer] = useState<{ name: string, time: string, timeLeft: string } | null>(null);
     const [locationName, setLocationName] = useState('');
     const [fastingDays, setFastingDays] = useState<string[]>([]); // 'YYYY-MM-DD'
@@ -108,14 +109,22 @@ export default function RamadanScreen() {
             setLocationName(address.city || address.region || 'Konumunuz');
         }
 
-        // Fetch Prayer Times (Aladhan API) - Method 13 (Diyanet)
+        // Fetch Monthly Prayer Times (Aladhan API) - Method 13 (Diyanet)
         const date = new Date();
-        const response = await fetch(`https://api.aladhan.com/v1/timings/${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}?latitude=${latitude}&longitude=${longitude}&method=13`);
+        const response = await fetch(`https://api.aladhan.com/v1/calendar/${date.getFullYear()}/${date.getMonth() + 1}?latitude=${latitude}&longitude=${longitude}&method=13`);
         const data = await response.json();
 
-        if (data.data && data.data.timings) {
-            setPrayerTimes(data.data.timings);
-            updateCountdown(data.data.timings);
+        if (data.data && Array.isArray(data.data)) {
+            setMonthlyPrayerTimes(data.data);
+            const todayData = data.data[date.getDate() - 1]; // 0-indexed for days of month (1st day is index 0)
+            if (todayData && todayData.timings) {
+                // The timings have "(EET)" appended, we should clean it: "05:14 (EET)" -> "05:14"
+                const cleanTimings = Object.fromEntries(
+                    Object.entries(todayData.timings).map(([k, v]) => [k, (v as string).split(' ')[0]])
+                ) as unknown as PrayerTimes;
+                setPrayerTimes(cleanTimings);
+                updateCountdown(cleanTimings);
+            }
         }
     };
 
@@ -237,32 +246,45 @@ export default function RamadanScreen() {
             </View>
 
             <ScrollView contentContainerStyle={{ padding: 16 }}>
-                {activeTab === 'imsakiye' && prayerTimes && (
-                    <View style={{ backgroundColor: '#032b23', borderRadius: 16, padding: 16 }}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)' }}>
-                            <Text style={{ color: '#fff', fontSize: 16 }}>İmsak</Text>
-                            <Text style={{ color: '#fff', fontSize: 16, fontWeight: '700' }}>{prayerTimes.Imsak || prayerTimes.Fajr}</Text>
-                        </View>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)' }}>
-                            <Text style={{ color: '#a8c5bf', fontSize: 16 }}>Güneş</Text>
-                            <Text style={{ color: '#a8c5bf', fontSize: 16, fontWeight: '700' }}>{prayerTimes.Sunrise}</Text>
-                        </View>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)' }}>
-                            <Text style={{ color: '#fff', fontSize: 16 }}>Öğle</Text>
-                            <Text style={{ color: '#fff', fontSize: 16, fontWeight: '700' }}>{prayerTimes.Dhuhr}</Text>
-                        </View>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)' }}>
-                            <Text style={{ color: '#fff', fontSize: 16 }}>İkindi</Text>
-                            <Text style={{ color: '#fff', fontSize: 16, fontWeight: '700' }}>{prayerTimes.Asr}</Text>
-                        </View>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)', backgroundColor: 'rgba(212,175,55,0.1)', paddingHorizontal: 8, marginHorizontal: -8, borderRadius: 8 }}>
-                            <Text style={{ color: '#D4AF37', fontSize: 16, fontWeight: '700' }}>Akşam (İftar)</Text>
-                            <Text style={{ color: '#D4AF37', fontSize: 16, fontWeight: '700' }}>{prayerTimes.Maghrib}</Text>
-                        </View>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12 }}>
-                            <Text style={{ color: '#fff', fontSize: 16 }}>Yatsı</Text>
-                            <Text style={{ color: '#fff', fontSize: 16, fontWeight: '700' }}>{prayerTimes.Isha}</Text>
-                        </View>
+                {activeTab === 'imsakiye' && monthlyPrayerTimes.length > 0 && (
+                    <View style={{ backgroundColor: '#032b23', borderRadius: 16, padding: 12 }}>
+                        <Text style={{ color: '#D4AF37', fontSize: 18, fontWeight: '700', marginBottom: 12, textAlign: 'center' }}>
+                            Aylık İmsakiye
+                        </Text>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                            <View>
+                                {/* Table Header */}
+                                <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: 'rgba(212,175,55,0.3)', paddingBottom: 8, marginBottom: 8 }}>
+                                    <Text style={{ color: '#a8c5bf', width: 90, fontWeight: '700' }}>Tarih</Text>
+                                    <Text style={{ color: '#fff', width: 60, fontWeight: '700', textAlign: 'center' }}>İmsak</Text>
+                                    <Text style={{ color: '#a8c5bf', width: 60, fontWeight: '700', textAlign: 'center' }}>Güneş</Text>
+                                    <Text style={{ color: '#fff', width: 60, fontWeight: '700', textAlign: 'center' }}>Öğle</Text>
+                                    <Text style={{ color: '#fff', width: 60, fontWeight: '700', textAlign: 'center' }}>İkindi</Text>
+                                    <Text style={{ color: '#D4AF37', width: 60, fontWeight: '700', textAlign: 'center' }}>Akşam</Text>
+                                    <Text style={{ color: '#fff', width: 60, fontWeight: '700', textAlign: 'center' }}>Yatsı</Text>
+                                </View>
+                                {/* Table Rows */}
+                                {monthlyPrayerTimes.map((dayData, index) => {
+                                    const t = dayData.timings;
+                                    const isToday = (index + 1) === new Date().getDate();
+                                    return (
+                                        <View key={index} style={{
+                                            flexDirection: 'row', paddingVertical: 8,
+                                            backgroundColor: isToday ? 'rgba(212,175,55,0.1)' : 'transparent',
+                                            borderRadius: isToday ? 8 : 0
+                                        }}>
+                                            <Text style={{ color: '#a8c5bf', width: 90 }}>{dayData.date.gregorian.date.slice(0, 5)}</Text>
+                                            <Text style={{ color: '#fff', width: 60, textAlign: 'center' }}>{t.Imsak?.split(' ')[0] || t.Fajr?.split(' ')[0]}</Text>
+                                            <Text style={{ color: '#a8c5bf', width: 60, textAlign: 'center' }}>{t.Sunrise?.split(' ')[0]}</Text>
+                                            <Text style={{ color: '#fff', width: 60, textAlign: 'center' }}>{t.Dhuhr?.split(' ')[0]}</Text>
+                                            <Text style={{ color: '#fff', width: 60, textAlign: 'center' }}>{t.Asr?.split(' ')[0]}</Text>
+                                            <Text style={{ color: '#D4AF37', width: 60, textAlign: 'center', fontWeight: 'bold' }}>{t.Maghrib?.split(' ')[0]}</Text>
+                                            <Text style={{ color: '#fff', width: 60, textAlign: 'center' }}>{t.Isha?.split(' ')[0]}</Text>
+                                        </View>
+                                    );
+                                })}
+                            </View>
+                        </ScrollView>
                     </View>
                 )}
 

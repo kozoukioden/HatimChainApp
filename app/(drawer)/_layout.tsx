@@ -75,7 +75,7 @@ function CustomDrawerContent(props: any) {
                 <DrawerItem
                     label="Bize Ulaşın"
                     icon={({ color, size }) => <Ionicons name="mail-outline" size={size} color={color} />}
-                    onPress={() => Linking.openURL('mailto:destek@hatimchain.com?subject=Destek/Öneri')}
+                    onPress={() => Linking.openURL('mailto:hmsoftwarestudio@gmail.com?subject=Destek/Öneri')}
                     labelStyle={{ color: '#a8c5bf' }}
                     inactiveTintColor="#a8c5bf"
                 />

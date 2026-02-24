@@ -76,8 +76,8 @@ export default function AskHocaScreen() {
 
     return (
         <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 80}
             style={{ flex: 1, backgroundColor: '#01241e' }}
         >
             <StatusBar style="light" />

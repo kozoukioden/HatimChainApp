@@ -92,8 +92,15 @@ export const FirestoreREST = {
 
     // Get a single document by path
     async getDoc(docPath: string): Promise<{ id: string; data: any } | null> {
-        const url = `${BASE_URL}/${docPath}?key=${API_KEY}&_t=${Date.now()}`;
-        const response = await fetch(url, { headers: { 'Cache-Control': 'no-cache' } });
+        const url = `${BASE_URL}/${docPath}?key=${API_KEY}`;
+        const response = await fetch(url, {
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0',
+                'X-Cache-Buster': Date.now().toString()
+            }
+        });
         if (response.status === 404) return null;
         if (!response.ok) {
             const err = await response.text();
@@ -106,8 +113,15 @@ export const FirestoreREST = {
 
     // List all documents in a collection
     async listDocs(collectionPath: string, pageSize: number = 300): Promise<{ id: string; data: any }[]> {
-        const url = `${BASE_URL}/${collectionPath}?key=${API_KEY}&pageSize=${pageSize}&_t=${Date.now()}`;
-        const response = await fetch(url, { headers: { 'Cache-Control': 'no-cache' } });
+        const url = `${BASE_URL}/${collectionPath}?key=${API_KEY}&pageSize=${pageSize}`;
+        const response = await fetch(url, {
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0',
+                'X-Cache-Buster': Date.now().toString()
+            }
+        });
         if (!response.ok) {
             const err = await response.text();
             throw new Error(`Firestore list failed (${response.status}): ${err}`);
