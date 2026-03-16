@@ -9,6 +9,17 @@ import { AuthService, User } from '../../services/auth';
 import { Linking } from 'react-native';
 import { censorName } from '../../services/utils';
 
+function formatDisplayDate(dateStr?: string): string {
+    if (!dateStr) return '';
+    try {
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' }) + ' ' +
+            d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+    } catch {
+        return dateStr;
+    }
+}
+
 const STATUS_COLORS: Record<string, string> = {
     available: '#ef4444',
     taken: '#6b7280',
@@ -239,11 +250,11 @@ export default function ChainDetailScreen() {
                     <View style={{ flexDirection: 'row', marginBottom: 16 }}>
                         <View style={{ flex: 1, backgroundColor: '#01241e', borderRadius: 12, padding: 12, marginRight: 8 }}>
                             <Text style={{ color: '#4a7a72', fontSize: 11, fontWeight: '600' }}>Başlangıç</Text>
-                            <Text style={{ color: '#fff', fontSize: 14, fontWeight: '600', marginTop: 4 }}>{chain.startDate}</Text>
+                            <Text style={{ color: '#fff', fontSize: 13, fontWeight: '600', marginTop: 4 }}>{formatDisplayDate(chain.startDate)}</Text>
                         </View>
                         <View style={{ flex: 1, backgroundColor: '#01241e', borderRadius: 12, padding: 12, marginLeft: 8 }}>
                             <Text style={{ color: '#4a7a72', fontSize: 11, fontWeight: '600' }}>Bitiş</Text>
-                            <Text style={{ color: '#fff', fontSize: 14, fontWeight: '600', marginTop: 4 }}>{chain.endDate}</Text>
+                            <Text style={{ color: '#fff', fontSize: 13, fontWeight: '600', marginTop: 4 }}>{formatDisplayDate(chain.endDate)}</Text>
                         </View>
                     </View>
 
