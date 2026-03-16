@@ -109,7 +109,8 @@ function formatDisplayDate(dateStr: string): string {
     if (!dateStr) return '';
     try {
         const d = new Date(dateStr);
-        return d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' });
+        return d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' }) + ' ' +
+            d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
     } catch {
         return dateStr;
     }
